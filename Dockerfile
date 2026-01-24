@@ -90,6 +90,7 @@ RUN <<EOT
 EOT
 
 RUN bun install --global @dbml/cli
+RUN bun install --global @sourcemeta/jsonschema
 
 RUN ln -s $(which bun) "${HOME}/.local/bin/node"
 
