@@ -60,7 +60,7 @@ RUN chown --recursive "${APP_USER}:${APP_USER}" /workspace
 USER "${APP_USER}"
 
 ENV HOME="/home/${APP_USER}"
-ENV PATH="${HOME}/.local/bin:${PATH}"
+ENV PATH="${HOME}/.local/bin:${HOME}/.bun/bin:${PATH}"
 ENV EDITOR="vim"
 ENV DO_NOT_TRACK="true"
 ENV CLAUDE_CONFIG_DIR="/claude"
@@ -77,5 +77,20 @@ RUN <<EOT
         "https://claude.ai/install.sh" | \
     bash
 EOT
+
+RUN <<EOT
+    set -o errexit -o pipefail && \
+    curl \
+        --fail \
+        --silent \
+        --show-error \
+        --location \
+        "https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh" | \
+    bash
+EOT
+
+RUN bun install --global @dbml/cli
+
+RUN ln -s $(which bun) "${HOME}/.local/bin/node"
 
 ENTRYPOINT ["claude"]
