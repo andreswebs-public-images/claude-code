@@ -23,6 +23,7 @@ RUN <<EOT
         ripgrep \
         rsync \
         socat \
+        sudo \
         tree \
         unzip \
         vim \
@@ -50,6 +51,11 @@ RUN \
       --shell /bin/bash \
       --create-home \
       "${APP_USER}"
+
+RUN \
+    mkdir --parents /etc/sudoers.d/ && \
+    echo "${APP_USER} ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/${APP_USER}" && \
+    chmod 0440 "/etc/sudoers.d/${APP_USER}"
 
 RUN mkdir /claude
 RUN chown --recursive "${APP_USER}:${APP_USER}" /claude
