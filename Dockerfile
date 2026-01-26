@@ -3,6 +3,11 @@ FROM docker.io/debian:trixie
 
 ARG DEBIAN_FRONTEND="noninteractive"
 
+COPY --from=mikefarah/yq /usr/bin/yq /usr/local/bin/
+COPY --from=denoland/deno:bin-2.6.4 /deno /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/bunx /usr/local/bin/
+
 RUN <<EOT
     set -o errexit && \
     apt-get update && \
@@ -31,11 +36,6 @@ RUN <<EOT
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 EOT
-
-COPY --from=mikefarah/yq /usr/bin/yq /usr/local/bin/
-COPY --from=denoland/deno:bin-2.6.4 /deno /usr/local/bin/
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
-COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/bunx /usr/local/bin/
 
 ARG APP_UID="2000"
 ARG APP_GID="2000"
@@ -97,7 +97,6 @@ EOT
 
 RUN bun install --global @dbml/cli
 RUN bun install --global @sourcemeta/jsonschema
-
 RUN ln --symbolic $(which bun) "${HOME}/.local/bin/node"
 
 ENTRYPOINT ["claude"]
