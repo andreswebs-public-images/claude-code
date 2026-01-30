@@ -24,6 +24,7 @@ RUN <<EOT
         less \
         lsof \
         man-db \
+        netcat-openbsd \
         openssh-client \
         procps \
         psmisc \
@@ -73,9 +74,28 @@ ENV EDITOR="vim"
 ENV DO_NOT_TRACK="true"
 ENV CLAUDE_CONFIG_DIR="/claude"
 
+RUN mkdir --parents "${HOME}/.local/share"
 RUN mkdir --parents "${HOME}/.local/bin"
 RUN ln --symbolic $(which bun) "${HOME}/.local/bin/node"
 RUN echo 'export PS1="\e[34m\u@\h\e[35m \w\e[0m\n$ "' >> "${HOME}/.bashrc"
+
+RUN bun install --global @dbml/cli
+RUN bun install --global @sourcemeta/jsonschema
+
+RUN <<EOT
+    set -o errexit -o pipefail
+    git clone https://github.com/wedow/ticket.git "${HOME}/.local/share/ticket"
+    cd "${HOME}/.local/share/ticket" || exit 1
+    ln --symbolic "$(pwd)/ticket" "${HOME}/.local/bin/tk"
+EOT
+
+RUN <<EOT
+    {
+        echo ":set number"
+        echo ":set et"
+        echo ":set sw=2 ts=2 sts=2"
+    } > "${HOME}/.vimrc"
+EOT
 
 RUN <<EOT
     set -o errexit -o pipefail
@@ -87,27 +107,5 @@ RUN <<EOT
         "https://claude.ai/install.sh" | \
     bash
 EOT
-
-RUN <<EOT
-    set -o errexit -o pipefail
-    curl \
-        --fail \
-        --silent \
-        --show-error \
-        --location \
-        "https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh" | \
-    bash
-EOT
-
-RUN <<EOT
-    {
-        echo ":set number"
-        echo ":set et"
-        echo ":set sw=2 ts=2 sts=2"
-    } > "${HOME}/.vimrc"
-EOT
-
-RUN bun install --global @dbml/cli
-RUN bun install --global @sourcemeta/jsonschema
 
 ENTRYPOINT ["claude"]
