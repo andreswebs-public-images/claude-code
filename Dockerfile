@@ -13,13 +13,18 @@ RUN <<EOT
     set -o errexit
     apt-get update
     apt-get install --yes --no-install-recommends \
+        bash-completion \
         bc \
         bzip2 \
         ca-certificates \
         curl \
+        direnv \
         dnsutils \
+        file \
         gh \
         git \
+        gnupg \
+        htop \
         jq \
         less \
         lsof \
@@ -33,6 +38,7 @@ RUN <<EOT
         socat \
         sudo \
         tree \
+        tmux \
         unzip \
         vim \
         zip
