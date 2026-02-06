@@ -35,6 +35,7 @@ RUN <<EOT
         psmisc \
         ripgrep \
         rsync \
+        shelltestrunner \
         socat \
         sudo \
         tree \
