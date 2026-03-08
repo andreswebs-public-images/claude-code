@@ -1,11 +1,11 @@
 # syntax=docker/dockerfile:1
-FROM docker.io/debian:trixie
+FROM docker.io/node:24-trixie
 
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 
 COPY --from=mikefarah/yq /usr/bin/yq /usr/local/bin/
-COPY --from=denoland/deno:bin-2.6.4 /deno /usr/local/bin/
+COPY --from=denoland/deno:bin /deno /usr/local/bin/
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/bunx /usr/local/bin/
 
@@ -76,18 +76,19 @@ RUN chown --recursive "${APP_USER}:${APP_USER}" /workspace
 USER "${APP_USER}"
 
 ENV HOME="/home/${APP_USER}"
-ENV PATH="${HOME}/.local/bin:${HOME}/.bun/bin:${PATH}"
+ENV NPM_CONFIG_PREFIX="${HOME}/.npm-global"
+ENV PATH="${HOME}/.local/bin:${HOME}/.npm-global/bin:${HOME}/.bun/bin:${PATH}"
 ENV EDITOR="vim"
 ENV DO_NOT_TRACK="true"
 ENV CLAUDE_CONFIG_DIR="/claude"
 
 RUN mkdir --parents "${HOME}/.local/share"
 RUN mkdir --parents "${HOME}/.local/bin"
-RUN ln --symbolic $(which bun) "${HOME}/.local/bin/node"
 RUN echo 'export PS1="\e[34m\u@\h\e[35m \w\e[0m\n$ "' >> "${HOME}/.bashrc"
 
-RUN bun install --global @dbml/cli
-RUN bun install --global @sourcemeta/jsonschema
+RUN npm install --global @dbml/cli
+RUN npm install --global @sourcemeta/jsonschema
+RUN npm install --global agent-browser
 
 RUN <<EOT
     set -o errexit -o pipefail
