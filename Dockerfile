@@ -8,6 +8,7 @@ COPY --from=mikefarah/yq /usr/bin/yq /usr/local/bin/
 COPY --from=denoland/deno:bin /deno /usr/local/bin/
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/bunx /usr/local/bin/
+COPY --from=golang:1.26-alpine /usr/local/go/ /usr/local/go/
 
 RUN <<EOT
     set -o errexit
@@ -35,6 +36,7 @@ RUN <<EOT
         psmisc \
         ripgrep \
         rsync \
+        shellcheck \
         shelltestrunner \
         socat \
         sudo \
@@ -77,7 +79,7 @@ USER "${APP_USER}"
 
 ENV HOME="/home/${APP_USER}"
 ENV NPM_CONFIG_PREFIX="${HOME}/.npm-global"
-ENV PATH="${HOME}/.local/bin:${HOME}/.npm-global/bin:${HOME}/.bun/bin:${PATH}"
+ENV PATH="${HOME}/.local/bin:${HOME}/.npm-global/bin:${HOME}/.bun/bin:/usr/local/go/bin:${HOME}/go/bin:${PATH}"
 ENV EDITOR="vim"
 ENV DO_NOT_TRACK="true"
 ENV CLAUDE_CONFIG_DIR="/claude"
@@ -89,6 +91,7 @@ RUN echo 'export PS1="\e[34m\u@\h\e[35m \w\e[0m\n$ "' >> "${HOME}/.bashrc"
 RUN npm install --global @dbml/cli
 RUN npm install --global @sourcemeta/jsonschema
 RUN npm install --global agent-browser
+RUN go install mvdan.cc/sh/v3/cmd/shfmt@latest
 
 RUN <<EOT
     set -o errexit -o pipefail
