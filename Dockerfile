@@ -9,6 +9,7 @@ COPY --from=denoland/deno:bin /deno /usr/local/bin/
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/bunx /usr/local/bin/
 COPY --from=golang:1.26-alpine /usr/local/go/ /usr/local/go/
+COPY --from=golangci/golangci-lint:latest-alpine /usr/bin/golangci-lint /usr/local/bin/
 
 RUN <<EOT
     set -o errexit
@@ -86,6 +87,7 @@ ENV CLAUDE_CONFIG_DIR="/claude"
 
 RUN mkdir --parents "${HOME}/.local/share"
 RUN mkdir --parents "${HOME}/.local/bin"
+RUN mkdir --parents "${HOME}/.cache"
 RUN echo 'export PS1="\e[34m\u@\h\e[35m \w\e[0m\n$ "' >> "${HOME}/.bashrc"
 
 RUN npm install --global @dbml/cli
