@@ -54,28 +54,39 @@ ARG APP_UID="2000"
 ARG APP_GID="2000"
 ARG APP_USER="claude"
 
-RUN \
+RUN <<EOT
+    set -o errexit
     groupadd \
-      --gid "${APP_GID}" "${APP_USER}" && \
+        --gid "${APP_GID}" "${APP_USER}"
     useradd \
-      --gid "${APP_GID}" \
-      --uid "${APP_UID}" \
-      --comment "" \
-      --shell /bin/bash \
-      --create-home \
-      "${APP_USER}"
+        --gid "${APP_GID}" \
+        --uid "${APP_UID}" \
+        --comment "" \
+        --shell /bin/bash \
+        --create-home \
+        "${APP_USER}"
+EOT
 
-RUN \
-    mkdir --parents /etc/sudoers.d/ && \
-    echo "${APP_USER} ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/${APP_USER}" && \
+RUN <<EOT
+    set -o errexit
+    mkdir --parents /etc/sudoers.d/
+    echo "${APP_USER} ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/${APP_USER}"
     chmod 0440 "/etc/sudoers.d/${APP_USER}"
+EOT
 
-RUN mkdir /claude
-RUN chown --recursive "${APP_USER}:${APP_USER}" /claude
+RUN <<EOT
+    set -o errexit
+    mkdir /workspace
+    chown --recursive "${APP_USER}:${APP_USER}" /workspace
+EOT
+
+RUN <<EOT
+    set -o errexit
+    mkdir /claude
+    chown --recursive "${APP_USER}:${APP_USER}" /claude
+EOT
 
 WORKDIR /workspace
-RUN chown --recursive "${APP_USER}:${APP_USER}" /workspace
-
 USER "${APP_USER}"
 
 ENV HOME="/home/${APP_USER}"
@@ -84,6 +95,14 @@ ENV PATH="${HOME}/.local/bin:${HOME}/.npm-global/bin:${HOME}/.bun/bin:/usr/local
 ENV EDITOR="vim"
 ENV DO_NOT_TRACK="true"
 ENV CLAUDE_CONFIG_DIR="/claude"
+
+RUN <<EOT
+    set -o errexit
+    mkdir --mode 0700 "${HOME}/.ssh"
+    ssh-keyscan github.com >> "${HOME}/.ssh/known_hosts"
+    ssh-keyscan gitlab.com >> "${HOME}/.ssh/known_hosts"
+    chmod 0600 "${HOME}/.ssh/known_hosts"
+EOT
 
 RUN mkdir --parents "${HOME}/.local/share"
 RUN mkdir --parents "${HOME}/.local/bin"
