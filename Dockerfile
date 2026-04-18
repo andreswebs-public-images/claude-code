@@ -33,6 +33,7 @@ RUN <<EOT
         man-db \
         netcat-openbsd \
         openssh-client \
+        poppler-utils \
         procps \
         psmisc \
         ripgrep \
