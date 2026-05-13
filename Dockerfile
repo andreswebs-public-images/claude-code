@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM docker.io/node:24-trixie
+FROM docker.io/node:26-trixie
 
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG DEBCONF_NONINTERACTIVE_SEEN="true"
