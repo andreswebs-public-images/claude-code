@@ -3,6 +3,9 @@ FROM docker.io/node:26-trixie
 
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG DEBCONF_NONINTERACTIVE_SEEN="true"
+ARG PYTHON_VERSION="3.13"
+
+ENV PYTHONUNBUFFERED="1"
 
 COPY --from=mikefarah/yq /usr/bin/yq /usr/local/bin/
 COPY --from=denoland/deno:bin /deno /usr/local/bin/
@@ -115,6 +118,7 @@ RUN npm install --global @dbml/cli
 RUN npm install --global @sourcemeta/jsonschema
 RUN npm install --global agent-browser
 RUN go install mvdan.cc/sh/v3/cmd/shfmt@latest
+RUN uv python install "${PYTHON_VERSION}" --default
 
 RUN <<EOT
     set -o errexit -o pipefail
