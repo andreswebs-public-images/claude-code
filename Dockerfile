@@ -3,9 +3,13 @@ FROM docker.io/node:26-trixie
 
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG DEBCONF_NONINTERACTIVE_SEEN="true"
-ARG PYTHON_VERSION="3.13"
+ARG PYTHON_VERSION="3.14"
 
 ENV PYTHONUNBUFFERED="1"
+ENV UV_PYTHON_INSTALL_DIR="/opt/uv/python"
+ENV UV_PYTHON_BIN_DIR="/usr/local/bin"
+ENV LANG="C.UTF-8"
+ENV LC_ALL="C.UTF-8"
 
 COPY --from=mikefarah/yq /usr/bin/yq /usr/local/bin/
 COPY --from=denoland/deno:bin /deno /usr/local/bin/
@@ -14,12 +18,15 @@ COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/bunx /usr/local/bin/
 COPY --from=golang:1.26-alpine /usr/local/go/ /usr/local/go/
 COPY --from=golangci/golangci-lint:latest-alpine /usr/bin/golangci-lint /usr/local/bin/
 
+RUN uv python install "${PYTHON_VERSION}" --default
+
 RUN <<EOT
     set -o errexit
     apt-get update
     apt-get install --yes --no-install-recommends \
         bash-completion \
         bc \
+        build-essential \
         bzip2 \
         ca-certificates \
         curl \
@@ -36,7 +43,9 @@ RUN <<EOT
         lsof \
         man-db \
         netcat-openbsd \
+        openssl \
         openssh-client \
+        pass \
         poppler-utils \
         procps \
         psmisc \
@@ -45,10 +54,12 @@ RUN <<EOT
         shellcheck \
         shelltestrunner \
         socat \
+        sqlite3 \
         sudo \
         tree \
         tmux \
         unzip \
+        uuid-runtime \
         vim \
         zip
     apt-get clean
@@ -118,7 +129,6 @@ RUN npm install --global @dbml/cli
 RUN npm install --global @sourcemeta/jsonschema
 RUN npm install --global agent-browser
 RUN go install mvdan.cc/sh/v3/cmd/shfmt@latest
-RUN uv python install "${PYTHON_VERSION}" --default
 
 RUN <<EOT
     set -o errexit -o pipefail
