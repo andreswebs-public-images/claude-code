@@ -128,6 +128,7 @@ RUN echo 'export PS1="\e[34m\u@\h\e[35m \w\e[0m\n$ "' >> "${HOME}/.bashrc"
 RUN npm install --global @dbml/cli
 RUN npm install --global @sourcemeta/jsonschema
 RUN npm install --global agent-browser
+RUN npm install --global markdownlint-cli2
 RUN go install mvdan.cc/sh/v3/cmd/shfmt@latest
 
 RUN <<EOT
