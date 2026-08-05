@@ -133,9 +133,9 @@ RUN go install mvdan.cc/sh/v3/cmd/shfmt@latest
 
 RUN <<EOT
     set -o errexit -o pipefail
-    git clone https://github.com/wedow/ticket.git "${HOME}/.local/share/ticket"
-    cd "${HOME}/.local/share/ticket" || exit 1
-    ln --symbolic "$(pwd)/ticket" "${HOME}/.local/bin/tk"
+    mkdir --parents /opt/ticket
+    git clone https://github.com/wedow/ticket.git /opt/ticket
+    ln --symbolic /opt/ticket/ticket /usr/local/bin/tk
 EOT
 
 RUN <<EOT
