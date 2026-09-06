@@ -102,6 +102,12 @@ RUN <<EOT
     chown --recursive "${APP_USER}:${APP_USER}" /claude
 EOT
 
+RUN <<EOT
+    set -o errexit
+    git clone https://github.com/wedow/ticket.git /opt/ticket
+    ln --symbolic /opt/ticket/ticket /usr/local/bin/tk
+EOT
+
 WORKDIR /workspace
 USER "${APP_USER}"
 
@@ -130,13 +136,6 @@ RUN npm install --global @sourcemeta/jsonschema
 RUN npm install --global agent-browser
 RUN npm install --global markdownlint-cli2
 RUN go install mvdan.cc/sh/v3/cmd/shfmt@latest
-
-RUN <<EOT
-    set -o errexit -o pipefail
-    mkdir --parents /opt/ticket
-    git clone https://github.com/wedow/ticket.git /opt/ticket
-    ln --symbolic /opt/ticket/ticket /usr/local/bin/tk
-EOT
 
 RUN <<EOT
     {
